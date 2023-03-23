@@ -1,0 +1,4 @@
+const constant = "변경할 수 없어요";
+
+const a = "처음 선언할 때 값을 할당해야합니다";
+//const b; 오류

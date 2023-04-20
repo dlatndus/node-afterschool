@@ -11,6 +11,24 @@
     <br>
     <form method="post" action="/student">
         <table>
+            <th>index</th>
+            <th>제목</th>
+            <th>내용</th>
+            <th>관리자 이름</th>
+            <th>고정</th>
+            <th>공개</th>
+            <% for(let i =0; i<5; i++){%>
+
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                </tr>
+                <%}%>
+
+<!--                 
             <tr>
                 <td><label>아이디</label></td>
                 <td><input type="text" name="id"/></td>
@@ -18,7 +36,7 @@
             <tr>
                 <td><label>비밀번호</label></td>
                 <td><input type="password" name="password"/></td>
-            </tr>
+            </tr> -->
         </table>
         <input type="submit" value="전송" name=""/>
     </form>

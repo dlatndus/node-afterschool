@@ -18,15 +18,20 @@ app.set('views', './views')
 
 app.get('/', (req, res)=>{
     console.log('/get start ejs test...');
-    fs.readFile('ejsex02-2.ejs', "utf-8", (err, data) =>{
-        if(err)
-        {
-            console.log('파일 읽기 에러' + err);
-        }
-        else{
-            res.send(ejs.render(data));
-        }
-    })
+    res.render('ejsex02',{
+        jemok : 'ejs 제목 데이터',
+        count : 4,
+    
+    });
+    // fs.readFile('ejsex02.ejs', "utf-8", (err, data) =>{
+    //     if(err)
+    //     {
+    //         console.log('파일 읽기 에러' + err);
+    //     }
+    //     else{
+    //         res.send(ejs.render(data));
+    //     }
+    // })
 });
 
 app.get('/login', (request, response)=>{

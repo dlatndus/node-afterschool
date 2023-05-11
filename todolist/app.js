@@ -6,6 +6,8 @@ let path = require('path');
 let todoArr = [
     {id:1, contents:'영화보기', yesno:'no'},
     {id:2, contents:'놀기', yesno:'no'},
+    {id:3, contents:'자기', yesno:'no'},
+    {id:4, contents:'쉬기', yesno:'no'},
     
 ];
 
@@ -22,15 +24,32 @@ app.get('/', (req, res)=>{
 });
 
 app.get('/insert', (req, res)=>{
-    console.log('/ insert get이 시작됨')
-    
+    console.log('/ insert get이 시작됨');
+    res.render('insert')
+    res.redirect("/");
+});
+
+app.post('/insert', (req, res)=>{
+    console.log('/ insert post이 시작됨');
+   todoArr.push({contents: req.body.contents, yesno:req.body.yesno});
+});
+
+app.get('/delete/:id', (req, res)=>{
+    console.log('/delete' + res.id);
+
+    todoArr.splice(res.id, 1);
+    console.log("delete ok~~" + res.id);
+    res.redirect("/");
 
 
 });
 
-app.get('/delete:id', (req, res)=>{
-    console.log('/deletet' + id)
-    res.redirect("/")
+app.get('/edit/:id', (req, res)=>{
+    console.log('/delete' + res.id);
+
+    todoArr.splice(res.id, 1);
+    console.log("delete ok~~" + res.id);
+    res.redirect("/");
 
 
 });

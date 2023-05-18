@@ -2,7 +2,15 @@ let express = require('express');
 let ejs = require('ejs');
 let app = express();
 let path = require('path');
+let mysql = require('mysql');
 
+let dbconn = mysql.createConnection({
+    user:'root',
+    password:'1234',
+    database:'mirimdb'
+})
+
+/*
 let todoArr = [
     {id:1, contents:'영화보기', yesno:'no'},
     {id:2, contents:'놀기', yesno:'no'},
@@ -10,8 +18,10 @@ let todoArr = [
     {id:4, contents:'쉬기', yesno:'no'},
     
 ];
+*/
 
-let count = 5;
+let todoArr =[];
+let count = 1;
 
 app.use(express.static('public')); //public 폴더 공유
 app.use(express.urlencoded({extended:false})); //사용자
@@ -19,12 +29,22 @@ app.set('views', path.join(__dirname, 'views')); //뷰 폴더 지정
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res)=>{
-    console.log('/ get이 시작됨')
-    res.render('list', {datalist : todoArr})//list.ejs 파일 출력
+    console.log('/ get이 시작됨');
+    dbconn.connect();
+    dbconn.query('select * from todotbl', (err, result)=>{
+        if(err){
+            console.log('db select error' + err);
+        }
+        else{
+            console.log(result);
+            res.render('list', {datalist:result});
+        }
+    });
 
-
+    dbconn.end();
 });
 
+/*
 app.get('/insert', (req, res)=>{
     console.log('/ insert get이 시작됨');
     res.render('insert')
@@ -87,6 +107,7 @@ if(req.body.contents && req.body.yesno){
     res.redirect("/");
 
 });
+*/
 
 app.listen(3000, ()=>{
     console.log("3000포트 서버가 시작됨");

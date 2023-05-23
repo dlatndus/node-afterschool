@@ -1,0 +1,111 @@
+let express = require('express');
+let ejs = require('ejs');
+let app = express();
+let path = require('path');
+let mysql = require('mysql');
+
+let dbconn = mysql.createConnection({
+    user:'root',
+    password:'1234',
+    database:'mirimdb'
+})
+
+/*
+let todoArr = [
+    {id:1, contents:'영화보기', yesno:'no'},
+    {id:2, contents:'놀기', yesno:'no'},
+    {id:3, contents:'자기', yesno:'no'},
+    {id:4, contents:'쉬기', yesno:'no'},
+    
+];
+*/
+
+let todoArr =[];
+let count = 1;
+
+app.use(express.static('public')); //public 폴더 공유
+app.use(express.urlencoded({extended:false})); //사용자
+app.set('views', path.join(__dirname, 'views')); //뷰 폴더 지정
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res)=>{
+    console.log('/ get이 시작됨');
+    //dbconn.connect();
+    dbconn.query('select * from todotbl', (err, result)=>{
+        if(err){
+            console.log('db select error' + err);
+        }
+        else{
+            console.log(result);
+            res.render('list', {datalist:result});
+        }
+    });
+    //dbconn.end();
+   
+});
+
+//insert uri get 방식
+app.get('/insert', (req, res)=>{
+    console.log('insert get');
+    res.render('insert'); //insert.ejs
+});
+
+//insert uri post 방식
+app.post('/insert', (req, res)=>{
+    console.log('/ insert get이 시작됨');
+    res.render('insert')
+    dbconn.query('insert into todotbl(id, contents, yesno) values(null, ?, ?)', 
+    [req.body.contents, req.body.yesno], (err, result)=>{
+        if(err){
+            console.log('db insert error' + err);
+        }
+        else{
+            console.log(`insert ok ${req.body.contents}, ${req.body.yesno}`);
+            res.redirect('/');
+        }
+    }); 
+});
+
+app.get('delete/:id', (req, res)=>{
+    dbconn.query('delete from todotbl where id =?', 
+    [req.params.id], (err, result)=>{
+        if(err){
+            console.log('db delete error' + err);
+        }
+        else{
+            console.log(`delete ok ${req.params.id}`);
+            res.redirect('/');
+        }
+    }); 
+});
+
+app.get('/edit/:id', (req, res)=>{
+    dbconn.query('select * from todotbl where id = ?', 
+    [req.params.id], (err, result)=>{
+        if(err){
+            console.log('db edit error' + err);
+        }
+        else{
+            console.log(`edit ok ${req.params.id}`);
+            res.render('edit', {data:result[0]});
+        }
+    }); 
+})
+
+app.post('/edit/:id', (req, res)=>{
+    dbconn.query('update todotbl set contents = ? where id = ?', 
+    [req.body.contents, req.body.yesno, req.params.id], (err, result)=>{
+        if(err){
+            console.log('db edit update error' + err);
+        }
+        else{
+            console.log(`edit update ok ${req.params.id}`);
+            res.redirect('/');
+        }
+    }); 
+
+});
+
+app.listen(3000, ()=>{
+    console.log("3000포트 서버가 시작됨");
+})

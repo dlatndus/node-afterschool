@@ -10,105 +10,84 @@ let dbconn = mysql.createConnection({
     database:'mirimdb'
 })
 
-/*
-let todoArr = [
-    {id:1, contents:'영화보기', yesno:'no'},
-    {id:2, contents:'놀기', yesno:'no'},
-    {id:3, contents:'자기', yesno:'no'},
-    {id:4, contents:'쉬기', yesno:'no'},
-    
-];
-*/
-
-let todoArr =[];
+let todoArr = [];
 let count = 1;
 
-app.use(express.static('public')); //public 폴더 공유
-app.use(express.urlencoded({extended:false})); //사용자
-app.set('views', path.join(__dirname, 'views')); //뷰 폴더 지정
+
+app.use(express.static('public'));
+app.use(express.urlencoded( {extended:false}));
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res)=>{
-    console.log('/ get이 시작됨');
-    dbconn.connect();
-    dbconn.query('select * from todotbl', (err, result)=>{
-        if(err){
+app.get('/', (req, res) => {
+    console.log('/get 시작');
+    //dbconn.connect();
+    dbconn.query('select * from todotbl', (err, results) => {
+        if(err) {
             console.log('db select error' + err);
-        }
-        else{
-            console.log(result);
-            res.render('list', {datalist:result});
+        } else {
+            console.log(results);
+            res.render('list', {datalist: results});
         }
     });
-
-    dbconn.end();
+    //dbconn.end();
 });
-
-/*
-app.get('/insert', (req, res)=>{
-    console.log('/ insert get이 시작됨');
-    res.render('insert')
-    res.redirect("/");
-});
-
-app.post('/insert', (req, res)=>{
-    console.log('/ insert post이 시작됨');
-   todoArr.push({contents: req.body.contents, yesno:req.body.yesno});
-
-    let id_num = count++;
-    todoArr.push({id:id_num, contents:req.body.contents, yesno:req.body.yesno})
-    res.redirect("/");
-});
-
-app.get('/delete/:id', (req, res)=>{
-    console.log('/delete' + req.params.id);
-
-    for(const i in todoArr){
-        if(todoArr[i].id == req.params.id){
-            todoArr.splice(i, 1);
-            console.log("delete ok~~" +i);
+// insert url get 방식
+app.get('/insert', (req, res) => {
+    console.log('insert get');
+    res.render('insert'); //insert.ejs
+})
+// insert url post 방식
+app.post('/insert', (req, res) => {
+    console.log('insert get');
+    dbconn.query('insert into todotbl(id, contents, yesno) values (null, ?, ?)', [req.body.contents, req.body.yesno], (err, results) => {
+        if(err) {
+            console.log('db insert error' + err);
+        } else {
+            console.log(`insert ok ${req.body.contents} ${req.body.yesno}`);
+            res.redirect('/');
         }
-    }
-    
-    
-    res.redirect("/");
+    })
+})
 
-
+app.get('/delete/:id', (req,res)=>{
+    dbconn.query('delete from todotbl where id = ?',
+    [req.params.id],
+    (err, results)=>{
+        if(err)
+            console.log('delete err '+err);
+        else{
+            console.log(`delete OK... ${req.params.id}`);
+        }
+    });
 });
 
 app.get('/edit/:id', (req, res)=>{
-    console.log('/edit' + req.params.id);
-    let editdata = [];
-    
-    for(const i in todoArr){
-        if(todoArr[i].id == req.params.id){
-            console.log("edit~~" + req.params.id);
-            editdata = todoArr[i];
-            res.render('edit', {data : editdata});
+    dbconn.query('select * from todotbl where id = ?',
+    [req.params.id], 
+    (err, results)=>{
+        if(err)
+            console.log('edit err '+err);
+           else{
+            console.log(`edit OK... ${req.params.id}`);
+            res.render('edit', {data:results[0]});
         }
-    }
-
-
-});
-
-app.post('/edit/:id', (req, res)=>{
-    console.log('/edit' + req.params.id);
-    let editdata = [];
-    
-if(req.body.contents && req.body.yesno){
-    console.log("수정값 : " +req.body.contents + "   " +   req.body.yesno)
-}
-    for(const i in todoArr){
-        if(todoArr[i].id == req.params.id){
-            console.log("edit~~" + res.id);
-            todoArr.splice(i, 1, {id:req.params.id, contents:req.body.contents, yesno: req.body.yesno})
-        }
-    }
-    res.redirect("/");
-
-});
-*/
-
-app.listen(3000, ()=>{
-    console.log("3000포트 서버가 시작됨");
+    })
 })
+
+app.post('/edit/:id', (req,res)=>{
+    dbconn.query('update todotbl set contents = ?, yesno = ? where id = ?',
+    [req.params.contents, req.body.yesno, req.body.id], 
+    (err, results)=>{
+        if(err)
+            console.log('edit err '+err);
+        else{
+            console.log(`edit update ok ${req.params.id}`);
+            res.redirect('/');
+        }
+    }); 
+})
+
+app.listen(3000, () => {
+    console.log("3000 서버가 시작");
+});

@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
     //dbconn.end();
 });
 // insert url get 방식
-app.get('/insert', (req, res) => {
+app.get('/api/insert', (req, res) => {
     console.log('insert get');
     res.render('insert'); //insert.ejs
 })
